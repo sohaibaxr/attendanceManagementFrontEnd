@@ -1,29 +1,84 @@
 import Vue from 'vue'
-import VueRouter from 'vue-router'
-import Home from '../views/Home.vue'
+import Router from 'vue-router'
+import RegisterUser from '../views/RegisterUser'
+import LoginUser from '../views/LoginUser'
+import Student from "../views/Student"
+import Teacher from "../views/Teacher"
+import Admin from "../views/Admin"
+import auth from "../middleware/auth"
 
-Vue.use(VueRouter)
+Vue.use(Router)
 
-const routes = [
-  {
-    path: '/',
-    name: 'Home',
-    component: Home
-  },
-  {
-    path: '/about',
-    name: 'About',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../views/About.vue')
-  }
-]
 
-const router = new VueRouter({
+const router = new Router({
+  routes: [
+    {
+      path: '/',
+      name: 'login',
+      component: LoginUser,
+    },
+    {
+      path: '/register',
+      name: 'Register',
+      component: RegisterUser,
+    },
+    {
+      path: '/home/admin',
+      name: 'admin',
+      component: Admin,
+      meta: {
+        middleware: [auth],
+      },
+    },
+    {
+      path: '/home/teacher',
+      name: 'teacher',
+      component: Teacher,
+      meta: {
+        middleware: [auth],
+      },
+    },
+    {
+      path: '/home/student',
+      name: 'student',
+      component: Student,
+      meta: {
+        middleware: [auth],
+      },
+    }
+  ],
   mode: 'history',
   base: process.env.BASE_URL,
-  routes
 })
 
+function nextFactory(context, middleware, index) {
+  const subsequentMiddleware = middleware[index];
+  if (!subsequentMiddleware) return context.next;
+
+  return (...parameters) => {
+    context.next(...parameters);
+    const nextMiddleware = nextFactory(context, middleware, index + 1);
+    subsequentMiddleware({ ...context, next: nextMiddleware });
+  };
+}
+
+router.beforeEach((to, from, next) => {
+  if (to.meta.middleware) {
+    const middleware = Array.isArray(to.meta.middleware)
+      ? to.meta.middleware
+      : [to.meta.middleware];
+
+    const context = {
+      from,
+      next,
+      router,
+      to,
+    };
+    const nextMiddleware = nextFactory(context, middleware, 1);
+    return middleware[0]({ ...context, next: nextMiddleware });
+  }
+  return next();
+});
+
 export default router
+
