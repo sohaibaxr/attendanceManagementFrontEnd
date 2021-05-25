@@ -31,7 +31,10 @@ export default {
     };
   },
   async mounted() {
-    var response = await axios.get("http://127.0.0.1:5000/api/courses");
+    const loggedInUserId = this.$cookie.get("loggedInUserId");
+    console.log(loggedInUserId)
+    var response = await axios.get(`http://127.0.0.1:5000/api/courses/students/${loggedInUserId}`);
+    console.log(response)
     this.Courses = response.data;
   },
   methods: {

@@ -38,32 +38,29 @@ export default {
   methods: {
     async login() {
       try {
-        let newUser = {
+        let requestedUser = {
           email: this.user.email,
           password: this.user.password,
         };
-        const response = await axios
-          .post("http://localhost:5000/api/users/loginUser", newUser)
-          .then((response) => {
-            if (response.data.token ) { this.$cookie.set("token", response.data.token)}
-            if (response.data && response.data._id){this.$cookie.set("loggedInUserId", response.data._id)};
-            if (response.data && response.data._id && response.data.role){this.$cookie.set("loggedInUserRole", response.data.role)};
-            if (response.data.role == "teacher") {this.$router.push("/home/teacher")}
-            if (response.data.role == "student") {this.$router.push("/home/student")}
-            if (response.data.role == "admin") {this.$router.push("/home/admin")}
-            else{
-              this.$toasted.show("Invalid Credentials")
+        const response = await axios.post("http://localhost:5000/api/users/loginUser", requestedUser)
+            if (response.data .token &&response.data._id && response.data.role) {
+              this.$cookie.set("token",response.data.token)
+              this.$cookie.set("loggedInUserId",response.data._id)
+              this.$cookie.set("loggedInUserRole",response.data.role)
+              if(response.data.role==="admin"){this.$router.push("home/admin")}
+              if(response.data.role==="teacher"){this.$router.push("home/teacher")}
+              if(response.data.role==="student"){this.$router.push("home/student")}
             }
-          });
+            else{
+              this.$toasted.show(response.data.message)
+            }   
       } catch (err) {
-        console.error(err);
-        this.$router.push("/");
-
+        console.error(err)
       }
     },
     register() {
-      this.$router.push("/register");
-    },
-  },
-};
+      this.$router.push("/register")
+    }
+  }
+}
 </script>

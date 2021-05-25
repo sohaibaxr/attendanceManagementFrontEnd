@@ -49,13 +49,13 @@ export default {
   },
   props: ["updateDialog", "courseName", "courseCode", "id"],
   async mounted() {
-    (this.name = this.courseName), (this.code = this.courseCode);
-    const response = await axios.get("http://127.0.0.1:5000/api/users");
-    this.Students = response.data.filter((d) => d.role == "student");
+    (this.name = this.courseName), (this.code = this.courseCode)
+    const response = await axios.get("http://127.0.0.1:5000/api/users")
+    this.Students = response.data.filter((d) => d.role == "student")
   },
   methods: {
     close() {
-      this.$emit("closeUpdateCourseDialog");
+      this.$emit("closeUpdateCourseDialog")
     },
     async updateCourse() {
       try {
@@ -67,9 +67,9 @@ export default {
         await axios.put( "http://127.0.0.1:5000/api/courses/" + this.id,updatedCourse
         );
       } catch (error) {
-        console.log(error);
+        console.log(error)
       }
-      this.$emit("closeUpdateCourseDialog");
+      this.$emit("closeUpdateCourseDialog")
     },
   },
 };

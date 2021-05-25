@@ -55,7 +55,7 @@ export default {
         if (response.status == 201) {
           this.$router.push("/");
         } else {
-          this.$toasted.show("Email Already Registered ");
+          this.$toasted.show(response.data.message );
         }
       } catch (err) {
         console.error(err);

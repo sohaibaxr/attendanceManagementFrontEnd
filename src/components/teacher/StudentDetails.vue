@@ -49,10 +49,11 @@ export default {
   methods: {
     async fetchData() {
       var response = await axios.get(
-        "http://127.0.0.1:5000/api/users/" + this.itemId);
+        "http://127.0.0.1:5000/api/users/attendance/" + this.itemId);
       this.Students = response.data;
     },
     async markAttendance(uid, status) {
+      console.log("what")
       try {
         let newAttendance = {
           student: uid,
@@ -61,6 +62,7 @@ export default {
           isPresent: status,
         }
         var response = await axios.post("http://127.0.0.1:5000/api/attendance",newAttendance)
+        console.log(response)
       } catch (error) {
         console.log(error)
       }
