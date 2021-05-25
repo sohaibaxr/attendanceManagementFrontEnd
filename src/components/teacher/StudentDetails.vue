@@ -1,12 +1,5 @@
 <template>
   <div>
-    <!-- <v-select
-      label="Choose Students"
-      outlined
-      class="mt-5"
-      :items="Students"
-      item-text="name"
-    ></v-select> -->
     <template>
       <v-data-table
         :headers="headers"
@@ -32,8 +25,6 @@ export default {
   name: "StudentDetail",
   data() {
     return {
-      attended: false,
-      items: ["present", "absent"],
       headers: [
         {
           text: "StudentName",
@@ -68,12 +59,10 @@ export default {
           course: this.itemId,
           date: new Date(),
           isPresent: status,
-        };
-        var response = await axios.post("http://127.0.0.1:5000/api/attendance",newAttendance
-        );
-        console.log(response);
+        }
+        var response = await axios.post("http://127.0.0.1:5000/api/attendance",newAttendance)
       } catch (error) {
-        console.log(error);
+        console.log(error)
       }
     },
   },

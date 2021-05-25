@@ -5,10 +5,8 @@ import LoginUser from '../views/LoginUser'
 import Student from "../views/Student"
 import Teacher from "../views/Teacher"
 import Admin from "../views/Admin"
-import auth from "../middleware/auth"
 
 Vue.use(Router)
-
 
 const router = new Router({
   routes: [
@@ -26,59 +24,68 @@ const router = new Router({
       path: '/home/admin',
       name: 'admin',
       component: Admin,
-      meta: {
-        middleware: [auth],
-      },
+      beforeEnter: authAdmin,
+
     },
     {
       path: '/home/teacher',
       name: 'teacher',
       component: Teacher,
-      meta: {
-        middleware: [auth],
-      },
+      beforeEnter: authTeacher
     },
     {
       path: '/home/student',
       name: 'student',
       component: Student,
-      meta: {
-        middleware: [auth],
-      },
+      beforeEnter: authStudent
+
     }
   ],
   mode: 'history',
   base: process.env.BASE_URL,
 })
 
-function nextFactory(context, middleware, index) {
-  const subsequentMiddleware = middleware[index];
-  if (!subsequentMiddleware) return context.next;
-
-  return (...parameters) => {
-    context.next(...parameters);
-    const nextMiddleware = nextFactory(context, middleware, index + 1);
-    subsequentMiddleware({ ...context, next: nextMiddleware });
-  };
-}
-
-router.beforeEach((to, from, next) => {
-  if (to.meta.middleware) {
-    const middleware = Array.isArray(to.meta.middleware)
-      ? to.meta.middleware
-      : [to.meta.middleware];
-
-    const context = {
-      from,
-      next,
-      router,
-      to,
-    };
-    const nextMiddleware = nextFactory(context, middleware, 1);
-    return middleware[0]({ ...context, next: nextMiddleware });
+function authAdmin(to, from, next) {
+  const authUser = Vue.cookie.get("token")
+  const authRole = Vue.cookie.get("loggedInUserRole")
+  
+  if (authUser && authRole === "admin") {
+    next()
+  } else {
+    if (authRole === "teacher") {
+      router.push({ name: "teacher" })
+    }else if(!authUser){
+      router.push({name:"login"})
+    }
+     else {
+      router.push({ name: "student" })
+    }
   }
-  return next();
-});
+}
+function authTeacher(to, from, next) {
+  const authUser = Vue.cookie.get("token")
+  const authRole = Vue.cookie.get("loggedInUserRole")
+  if (authUser && (authRole === "teacher" || authRole === "admin")) {
+    next()
+  }
+  else if(!authUser){
+    router.push({name:"login"})
+  } else {
+    router.push({ name: "student" })
+  }
+}
+function authStudent(to, from, next) {
+  const authUser = Vue.cookie.get("token")
+  const authRole = Vue.cookie.get("loggedInUserRole")
+  if (authUser && (authRole === "student" || authRole === "admin")) {
+    next()
+  }else if(!authUser){
+    router.push({name:"login"})
+  }
+   else {
+    router.push({ name: "teacher" })
+  }
+}
 
 export default router
 

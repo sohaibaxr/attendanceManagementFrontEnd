@@ -47,6 +47,7 @@ export default {
           .then((response) => {
             if (response.data.token ) { this.$cookie.set("token", response.data.token)}
             if (response.data && response.data._id){this.$cookie.set("loggedInUserId", response.data._id)};
+            if (response.data && response.data._id && response.data.role){this.$cookie.set("loggedInUserRole", response.data.role)};
             if (response.data.role == "teacher") {this.$router.push("/home/teacher")}
             if (response.data.role == "student") {this.$router.push("/home/student")}
             if (response.data.role == "admin") {this.$router.push("/home/admin")}
