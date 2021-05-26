@@ -32,15 +32,14 @@ export default {
   },
   async mounted() {
     const loggedInUserId = this.$cookie.get("loggedInUserId");
-    console.log(loggedInUserId)
     var response = await axios.get(`http://127.0.0.1:5000/api/courses/students/${loggedInUserId}`);
-    console.log(response)
     this.Courses = response.data;
   },
   methods: {
     async fetchStudentAttendance() {
       const loggedInUserId = this.$cookie.get("loggedInUserId");
-      var response2 = await axios.get(`http://127.0.0.1:5000/api/attendance/${this.id}&${loggedInUserId}`);
+      const response2 = await axios.get(`http://127.0.0.1:5000/api/attendance/studentcourse/${this.id}&${loggedInUserId}`);
+      console.log(response2.data)
       this.Students = response2.data;
     },
   },
